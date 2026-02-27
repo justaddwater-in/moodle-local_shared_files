@@ -1,0 +1,19 @@
+{
+    "description": "Example context for delete template",
+    "context": {
+        "name": "test.txt",
+        "isfile": true,
+        "isfolder": false,
+        "fileinfo": {
+            "path": "root/test.txt",
+            "size": "2 KB",
+            "mtime": "1 Jan 2025"
+        },
+        "path": "root/test.txt",
+        "sesskey": "abc123",
+        "cancelurl": "#",
+        "isempty": false,
+        "istruncated": false,
+        "maxitems": 10
+    }
+}

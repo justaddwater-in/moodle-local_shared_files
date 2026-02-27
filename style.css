@@ -1,0 +1,285 @@
+/* ===============================
+   Base Layout
+   =============================== */
+
+.repo-layout {
+    display: flex;
+    gap: 1rem;
+    padding: 1rem 0;
+}
+
+/* ===============================
+   Sidebar (LEFT)
+   =============================== */
+
+.repo-sidebar {
+    width: 240px;
+    padding: 0 0.75rem 0 0;
+    margin-right: 1.25rem;
+
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+}
+
+
+.repo-sidebar-title {
+    font-size: 0.9rem;
+    font-weight: 600;
+}
+
+.repo-create-form {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.repo-create-form input {
+    flex: 1;
+    padding: 6px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 0.85rem;
+}
+
+.repo-create-form button {
+    white-space: nowrap;
+}
+
+/* Folder tree */
+.folder-tree {
+    list-style: none;
+    padding-left: 0.50rem;
+    margin-top: 0.5rem;
+}
+
+.folder-tree li {
+    margin: 4px 0;
+}
+
+.folder-tree a {
+    text-decoration: none;
+    color: #0b5ed7;
+    font-size: 0.85rem;
+}
+
+.folder-tree a:hover {
+    text-decoration: underline;
+}
+
+/* ===============================
+   Main Content (RIGHT)
+   =============================== */
+
+.repo-content {
+    flex: 1;
+    min-width: 0;
+    display: flex;
+    flex-direction: column;
+    border-left: 1px solid #e5e5e5;
+    padding: 1rem;
+}
+
+/* ===============================
+   Header / Toolbar
+   =============================== */
+
+.repo-header {
+    flex-shrink: 0;
+    margin-bottom: 0.75rem;
+}
+
+.repo-toolbar {
+    display: flex;
+    gap: 1rem;
+    margin-bottom: 0.75rem;
+}
+
+/* Upload card */
+.tool-card {
+    background: #ffffff;
+    border-radius: 10px;
+    border: 1px solid #e3e6ea;
+    padding: 1rem;
+
+    display: flex;
+    flex-direction: column;
+}
+
+/* Make upload card fill remaining space */
+.repo-toolbar .tool-card {
+    flex: 1;
+    min-height: 260px;
+}
+
+/* ===============================
+   Breadcrumbs
+   =============================== */
+
+.repo-nav {
+    font-size: 0.85rem;
+}
+
+.repo-nav a {
+    color: #0b5ed7;
+    text-decoration: none;
+}
+
+.repo-nav a:hover {
+    text-decoration: underline;
+}
+
+/* ===============================
+   Dropzone (FULL FILL)
+   =============================== */
+
+.dropzone {
+    flex: 1;
+    width: 100%;
+    height: 100%;
+
+    border: 2px dashed #cfd4da;
+    border-radius: 10px;
+    background: #fafafa;
+
+    padding: 1rem;
+    text-align: center;
+    cursor: pointer;
+
+    display: flex;
+    flex-wrap: wrap;
+    align-content: flex-start;
+    justify-content: center;
+
+    overflow-y: auto;
+    overflow-x: hidden;
+
+    transition: background 0.2s, border-color 0.2s;
+}
+
+.dropzone:hover {
+    background: #f1f3f5;
+    border-color: #0b5ed7;
+}
+
+.dropzone .dz-message {
+    width: 100%;
+    font-size: 0.9rem;
+    color: #495057;
+    margin: auto;
+}
+
+/* ===============================
+   Dropzone Previews
+   =============================== */
+
+.dropzone .dz-preview {
+    width: 110px;
+    margin: 8px;
+    box-sizing: border-box;
+}
+
+.dropzone .dz-preview .dz-image {
+    width: 100%;
+    height: 90px;
+    border-radius: 6px;
+    overflow: hidden;
+}
+
+.dropzone .dz-preview .dz-details {
+    font-size: 0.75rem;
+    margin-top: 4px;
+}
+
+.dropzone .dz-preview .dz-filename {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+}
+
+/* ===============================
+   Table
+   =============================== */
+
+.repo-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 0.5rem;
+}
+
+.repo-table th,
+.repo-table td {
+    padding: 8px 10px;
+    border: 1px solid #e5e5e5;
+    text-align: left;
+    font-size: 0.85rem;
+}
+
+.repo-table th {
+    background: #f7f7f7;
+    font-weight: 600;
+}
+
+.repo-table tr:hover {
+    background-color: #fafafa;
+}
+
+/* ===============================
+   Buttons
+   =============================== */
+
+button,
+.btn {
+    padding: 6px 12px;
+    border-radius: 6px;
+    border: none;
+    font-size: 0.8rem;
+    cursor: pointer;
+}
+
+.btn-secondary {
+    background: #6c757d;
+    color: #ffffff;
+}
+
+.btn-secondary:hover {
+    background: #5c636a;
+}
+
+.btn-danger {
+    background: #dc3545;
+    color: #ffffff;
+}
+
+.btn-danger:hover {
+    background: #bb2d3b;
+}
+
+/* ===============================
+   Empty State
+   =============================== */
+
+.repo-empty {
+    margin-top: 1rem;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+.repo-actions {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin: 0.75rem 0;
+}
+
+.repo-create-inline {
+    display: flex;
+    gap: 0.4rem;
+}
+
+.repo-create-inline input {
+    padding: 6px 8px;
+    border: 1px solid #ced4da;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    width: 180px;
+}

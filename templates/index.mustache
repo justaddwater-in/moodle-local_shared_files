@@ -1,0 +1,136 @@
+{{!
+    This file is part of Moodle - http://moodle.org/
+
+    Moodle is free software: you can redistribute it and/or modify
+    it under the terms of the GNU General Public License as published by
+    the Free Software Foundation, either version 3 of the License, or
+    (at your option) any later version.
+
+    Moodle is distributed in the hope that it will be useful,
+    but WITHOUT ANY WARRANTY; without even the implied warranty of
+    MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+    GNU General Public License for more details.
+
+    You should have received a copy of the GNU General Public License
+    along with Moodle.  If not, see <http://www.gnu.org/licenses/>;.
+}}
+
+{{!
+    @template local_shared_files/index
+
+    Template for Shared Files repository main page. Displays folder contents, upload area, and folder creation form.
+
+}}
+
+<div class="repo-layout">
+
+  <!-- LEFT: Folder list -->
+  {{!
+    <aside class="repo-sidebar">
+      <h6 class="repo-sidebar-title">Folders</h6>
+      <form id="create-folder-form" class="repo-create-form">
+              <input type="text"
+                    name="foldername"
+                    placeholder="Folder name"
+                    required>
+              <button type="submit" class="btn btn-secondary">
+                Create
+              </button>
+            </form>
+      <div id="repo-folder-tree">
+        <!-- Folder list will be injected here via JS -->
+      </div>
+    </aside>
+  }}
+
+  <!-- RIGHT: Main content -->
+  <main class="repo-content">
+
+    <div class="repo-header">
+
+      {{#canmanage}}
+      <div class="repo-toolbar">
+
+        <div class="tool-card p-3">
+          <div id="shared-files-dropzone"
+               class="dropzone"
+               data-uploadurl="{{upload_url}}"
+               data-sesskey="{{sesskey}}"
+               data-path="{{currentpath}}">
+            <div class="dz-message">
+              Drag & drop files here or click to upload
+            </div>
+          </div>
+        </div>
+      </div>
+      {{/canmanage}}
+
+      <nav class="repo-nav">
+        {{#breadcrumbs}}
+          <a href="{{url}}">{{name}}</a> /
+        {{/breadcrumbs}}
+      </nav>
+
+    </div>
+    <div class="repo-actions">
+      {{#canmanage}}
+      <form id="create-folder-form" class="repo-create-inline">
+        <input type="text"
+              name="foldername"
+              placeholder="New folder name"
+              required>
+        <button type="submit" class="btn btn-secondary">
+          + New Folder
+        </button>
+      </form>
+      {{/canmanage}}
+    </div>
+
+    <table id="repo-table" class="repo-table">
+      <thead>
+        <tr>
+          <th>Name</th>
+          <th>Type</th>
+          <th>Size</th>
+          <th>Actions</th>
+        </tr>
+      </thead>
+      <tbody>
+
+        {{#items}}
+        <tr>
+          <td>
+            {{#url}}<a href="{{url}}">{{name}}</a>{{/url}}
+            {{^url}}{{name}}{{/url}}
+          </td>
+          <td>{{type}}</td>
+          <td>{{size}}</td>
+          <td>
+            {{#can_delete}}
+              <a href="{{delete_url}}" class="btn btn-danger btn-sm">
+                {{#str}} delete, local_shared_files {{/str}}
+              </a>
+            {{/can_delete}}
+          </td>
+        </tr>
+        {{/items}}
+
+        {{#isempty}}
+        <tr>
+          <td colspan="5" class="text-center text-muted">
+            {{#str}} emptyrepo, local_shared_files {{/str}}
+          </td>
+        </tr>
+        {{/isempty}}
+
+      </tbody>
+    </table>
+
+    {{#isempty}}
+    <div class="repo-empty">
+      {{#str}} emptyrepo, local_shared_files {{/str}}
+    </div>
+    {{/isempty}}
+
+  </main>
+</div>

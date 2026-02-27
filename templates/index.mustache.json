@@ -1,0 +1,26 @@
+{
+    "description": "Example context for index template",
+    "context": {
+        "canmanage": true,
+        "upload_url": "#",
+        "sesskey": "abc123",
+        "breadcrumbs": [
+            {
+                "url": "#",
+                "name": "Root"
+            }
+        ],
+        "items": [
+            {
+                "url": "#",
+                "name": "example.txt",
+                "type": "File",
+                "size": "1 KB",
+                "path": "root/example.txt",
+                "can_delete": true,
+                "delete_url": "#"
+            }
+        ],
+        "isempty": false
+    }
+}
