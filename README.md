@@ -32,5 +32,9 @@ Alternatively, you can run
 
 to complete the installation from the command line.
 
+## Support and Feedback
+- This plugin is developed and maintained by <a href="https://justaddwater.in/">JUSTADDWATER</a>. 
+- You can also use <a href="https://justaddwater.in/contact/">contact page</a> on our website for reporting issues, support or any other feedback.  
+
 ## License
 GPL v3

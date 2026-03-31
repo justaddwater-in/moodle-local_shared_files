@@ -22,25 +22,22 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/ajax'], function ($, Ajax) {
+define(['jquery', 'core/ajax', 'core/log'], function($, Ajax, Log) {
     return {
-        DTinit: function (selector, path, options) {
-            // Dynamically load the DataTables library
-            require(['js/datatables.min.js'], function () {
-                // Initialize the DataTable
-                $(document).ready(function () {
+        DTinit: function(selector, path, options) {
+            require(['js/datatables.min.js'], function() {
+                $(document).ready(function() {
                     if ($.fn.DataTable) {
                         $(selector).DataTable({
                             processing: true,
                             serverSide: false,
-
-                            ajax: function (data, callback) {
+                            ajax: function(data, callback) {
                                 Ajax.call([{
                                     methodname: 'local_shared_files_list_items',
-                                    args: { path: path }
-                                }])[0].done(function (response) {
+                                    args: {path: path}
+                                }])[0].done(function(response) {
                                     callback({
-                                        data: response.data.map(function (item) {
+                                        data: response.data.map(function(item) {
                                             return [
                                                 item.name,
                                                 item.type,
@@ -49,15 +46,12 @@ define(['jquery', 'core/ajax'], function ($, Ajax) {
                                             ];
                                         })
                                     });
-
                                 });
                             },
-
                             ...options
                         });
-
                     } else {
-                        console.error('DataTables library failed to load.');
+                        Log.error('DataTables library failed to load.');
                     }
                 });
             });

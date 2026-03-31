@@ -31,23 +31,24 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
 
                 const path = $(this).data('path');
 
-                if (!confirm('Are you sure you want to delete this item?')) {
-                    return;
-                }
-
-                Ajax.call([{
-                    methodname: 'local_shared_files_delete_item',
-                    args: { path: path }
-                }])[0].done(function(response) {
-                    if (response.success) {
-                        $('#repo-table').DataTable().ajax.reload(null, false);
-                    } else {
-                        Notification.alert('Delete failed', 'Unable to delete item');
+                Notification.confirm(
+                    'Delete',
+                    'Are you sure you want to delete this item?',
+                    'Yes',
+                    'Cancel',
+                    function() {
+                        Ajax.call([{
+                            methodname: 'local_shared_files_delete_item',
+                            args: {path: path}
+                        }])[0].done(function(response) {
+                            if (response.success) {
+                                $('#repo-table').DataTable().ajax.reload(null, false);
+                            } else {
+                                Notification.alert('Delete failed', 'Unable to delete item');
+                            }
+                        }).fail(Notification.exception);
                     }
-
-                }).fail(function(error) {
-                    Notification.exception(error);
-                });
+                );
             });
         }
     };

@@ -82,7 +82,7 @@ function local_shared_files_get_root(): string {
         throw new moodle_exception('configuredrepo', 'local_shared_files');
     }
 
-    $root = $CFG->dataroot . '/' . trim($repo, '/');
+    $root = $CFG->dataroot . '/repository/' . trim($repo, '/');
 
     // AUTO-CREATE if missing.
     if (!file_exists($root)) {

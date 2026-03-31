@@ -39,8 +39,8 @@ $context = context_system::instance();
 $PAGE->set_url(new moodle_url('/local/shared_files/create_repository.php'));
 $PAGE->set_context($context);
 $PAGE->set_pagelayout('admin');
-$PAGE->set_title(get_string('setuprepository', 'local_shared_files'));
-$PAGE->set_heading(get_string('setuprepository', 'local_shared_files'));
+$PAGE->set_title(get_string('finishsetup', 'local_shared_files'));
+$PAGE->set_heading(get_string('finishsetup', 'local_shared_files'));
 
 $parenturl = new moodle_url('/local/shared_files/index.php');
 
@@ -99,5 +99,11 @@ if ($mform->is_cancelled()) {
 }
 
 echo $OUTPUT->header();
+echo html_writer::tag('style', '
+    #fitem_id_fs_path,
+    #fitem_id_ {
+        display:none !important;
+    }
+');
 $mform->display();
 echo $OUTPUT->footer();

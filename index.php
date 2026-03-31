@@ -144,7 +144,7 @@ $datatableoptions = [
     'info' => true,
     'pageLength' => 25,
     'lengthMenu' => [10, 25, 50],
-    'order' => [[1, 'desc']],
+    'order' => false,
     'language' => ['emptyTable' => "No Topics to display"],
 ];
 $PAGE->requires->js_call_amd(

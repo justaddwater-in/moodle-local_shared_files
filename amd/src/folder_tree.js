@@ -23,10 +23,17 @@
  */
 
 define(['jquery', 'core/ajax'], function($, Ajax) {
+
+    /**
+     * Render folder tree recursively.
+     *
+     * @param {Array} nodes
+     * @returns {Object}
+     */
     function renderTree(nodes) {
         const ul = $('<ul class="folder-tree"></ul>');
 
-        nodes.forEach(node => {
+        nodes.forEach(function(node) {
             const li = $('<li></li>');
             const link = $('<a href="#"></a>')
                 .text(node.name)
@@ -49,6 +56,9 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
         return ul;
     }
 
+    /**
+     * Load folder tree from server.
+     */
     function loadTree() {
         Ajax.call([{
             methodname: 'local_shared_files_get_tree',

@@ -18,8 +18,32 @@
 {{!
     @template local_shared_files/index
 
-    Template for Shared Files repository main page. Displays folder contents, upload area, and folder creation form.
+    Template for Shared Files repository main page.
 
+    Example context (json):
+    {
+        "canmanage": true,
+        "upload_url": "/upload.php",
+        "sesskey": "abc123",
+        "currentpath": "/",
+        "breadcrumbs": [
+            {
+                "url": "/",
+                "name": "Home"
+            }
+        ],
+        "items": [
+            {
+                "name": "file1.txt",
+                "type": "file",
+                "size": "10 KB",
+                "url": "/file1.txt",
+                "can_delete": true,
+                "delete_url": "/delete.php?file=1"
+            }
+        ],
+        "isempty": false
+    }
 }}
 
 <div class="repo-layout">

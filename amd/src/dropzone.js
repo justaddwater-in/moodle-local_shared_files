@@ -22,12 +22,12 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery'], function($) {
+define(['jquery', 'core/log'], function($, Log) {
     return {
         DZinit: function(canmanage) {
             require(['js/dropzone.min.js'], function() {
                 if (typeof window.Dropzone === 'undefined') {
-                    console.error('Dropzone not loaded');
+                    Log.error('Dropzone not loaded');
                     return;
                 }
 
@@ -37,57 +37,50 @@ define(['jquery'], function($) {
                 if (!element || !canmanage) {
                     return;
                 }
+
                 const sesskey = element.dataset.sesskey;
-                const path    = element.dataset.path || '';
+                const path = element.dataset.path || '';
 
                 const dz = new window.Dropzone(element, {
                     url: M.cfg.wwwroot + '/local/shared_files/upload.php',
                     paramName: 'file',
                     maxFilesize: 100,
-
                     uploadMultiple: true,
-                    parallelUploads: 5,  
+                    parallelUploads: 5,
                     maxFiles: 50,
-
                     params: {
                         sesskey: sesskey,
                         path: path
                     },
-
                     headers: {
                         'X-Requested-With': 'XMLHttpRequest'
                     },
-
                     success: function(file, response) {
                         if (typeof response === 'string') {
                             try {
                                 response = JSON.parse(response);
                             } catch (e) {
-                                console.error('Invalid JSON response');
+                                Log.error('Invalid JSON response');
                                 return;
                             }
                         }
 
                         if (!response.success) {
-                            console.error('Upload failed:', response.error);
+                            Log.error('Upload failed: ' + response.error);
                         }
                     },
-
                     error: function(file, message) {
-                        console.error('Upload error:', message);
+                        Log.error('Upload error: ' + message);
                     }
                 });
 
-                /**
-                 * RELOAD ONCE AFTER ALL FILES
-                 */
                 dz.on('queuecomplete', function() {
                     if ($.fn.DataTable.isDataTable('#repo-table')) {
                         $('#repo-table').DataTable().ajax.reload(null, false);
                     }
                 });
 
-                console.log('Dropzone initialized (multi-upload)');
+                Log.debug('Dropzone initialized');
             });
         }
     };

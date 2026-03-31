@@ -141,6 +141,16 @@ class local_shared_files_listing extends external_api {
             }
         }
 
+        usort($data, function ($a, $b) {
+            if ($a['type'] === 'Folder' && $b['type'] !== 'Folder') {
+                return -1;
+            }
+            if ($a['type'] !== 'Folder' && $b['type'] === 'Folder') {
+                return 1;
+            }
+            return 0;
+        });
+
         return [
             'data' => $data,
         ];
