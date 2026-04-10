@@ -34,7 +34,10 @@ define(['jquery', 'core/ajax', 'core/log'], function($, Ajax, Log) {
                             ajax: function(data, callback) {
                                 Ajax.call([{
                                     methodname: 'local_shared_files_list_items',
-                                    args: {path: path}
+                                    args: {
+                                        path: path,
+                                        sesskey: M.cfg.sesskey
+                                    }
                                 }])[0].done(function(response) {
                                     callback({
                                         data: response.data.map(function(item) {

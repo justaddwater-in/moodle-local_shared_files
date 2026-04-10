@@ -56,9 +56,23 @@ $repotype = $DB->get_record('repository', [
     'type' => 'filesystem',
 ], '*', MUST_EXIST);
 
-$existing = $DB->get_record('repository_instances', [
+$configpath = get_config('local_shared_files', 'repo_path');
+
+$sql = "SELECT ri.id
+        FROM {repository_instances} ri
+        JOIN {repository_instance_config} ric
+          ON ric.instanceid = ri.id
+        WHERE ri.typeid = :typeid
+          AND ric.name = :name
+          AND ric.value = :value";
+
+$params = [
     'typeid' => $repotype->id,
-]);
+    'name'   => 'fs_path',
+    'value'  => $configpath,
+];
+
+$existing = $DB->get_record_sql($sql, $params);
 
 if ($existing) {
     redirect($parenturl);
@@ -77,9 +91,8 @@ if ($mform->is_cancelled()) {
     redirect($parenturl);
 } else if ($fromform = $mform->get_data()) {
     // Force folder if needed.
-    if (empty($fromform->fs_path)) {
-        $fromform->fs_path = 'shared_files';
-    }
+    $configpath = get_config('local_shared_files', 'repo_path');
+    $fromform->fs_path = $configpath;
 
     $success = repository::static_function(
         'filesystem',

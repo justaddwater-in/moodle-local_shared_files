@@ -42,7 +42,8 @@ define([
                     methodname: 'local_shared_files_create_folder',
                     args: {
                         path: path,
-                        foldername: foldername
+                        foldername: foldername,
+                        sesskey: M.cfg.sesskey
                     }
                 }])[0]
                 .done(function(response) {

@@ -62,7 +62,9 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
     function loadTree() {
         Ajax.call([{
             methodname: 'local_shared_files_get_tree',
-            args: {}
+            args: {
+                sesskey: M.cfg.sesskey
+            }
         }])[0].done(function(tree) {
             $('#repo-folder-tree')
                 .empty()
