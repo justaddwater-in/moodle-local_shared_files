@@ -58,6 +58,7 @@ class local_shared_files_listing extends external_api {
      * List files and folders inside repository path.
      *
      * @param string $path Relative path
+     * @param string $sesskey Session key for CSRF protection.
      * @return array
      * @throws moodle_exception
      */
@@ -71,7 +72,6 @@ class local_shared_files_listing extends external_api {
                 'sesskey' => $sesskey,
             ]
         );
-        
         require_sesskey();
 
         $context = context_system::instance();

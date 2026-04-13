@@ -57,6 +57,9 @@ class local_shared_files_get_tree extends external_api {
     /**
      * Return directory tree from repository root.
      *
+     * @param string $sesskey Session key for CSRF protection.
+     * Return directory tree from repository root.
+     *
      * @return array Folder tree
      * @throws required_capability_exception
      */
@@ -73,7 +76,7 @@ class local_shared_files_get_tree extends external_api {
         $context = context_system::instance();
         self::validate_context($context);
 
-        // Capability check
+        // Capability check.
         require_capability('local/shared_files:view', $context);
 
         $repo = get_config('local_shared_files', 'repo_path');

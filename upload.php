@@ -93,8 +93,19 @@ $files = $_FILES['file'];
 $multiple = is_array($files['name']);
 $count = $multiple ? count($files['name']) : 1;
 
-// Maximum allowed file size (20MB).
-$maxsize = 20 * 1024 * 1024;
+// Get max upload size from Moodle + PHP settings.
+$moodlemax = get_max_upload_file_size($CFG->maxbytes);
+
+// Fallback safety: also respect PHP limits.
+$uploadmax = ini_get('upload_max_filesize');
+$postmax   = ini_get('post_max_size');
+
+// Convert PHP values to bytes.
+$uploadmaxbytes = display_size_to_bytes($uploadmax);
+$postmaxbytes   = display_size_to_bytes($postmax);
+
+// Final allowed size = safest minimum.
+$maxsize = min($moodlemax, $uploadmaxbytes, $postmaxbytes);
 
 // Allowed file extensions.
 $allowedextensions = [
@@ -143,7 +154,8 @@ for ($i = 0; $i < $count; $i++) {
 
     // Enforce maximum file size.
     if ($size > $maxsize) {
-        $errors[] = "File is too large. Maximum allowed size is 20MB.";
+        $maxmb = round($maxsize / (1024 * 1024));
+        $errors[] = "File is too large. Maximum allowed size is {$maxmb}MB.";
         continue;
     }
 
@@ -205,14 +217,16 @@ for ($i = 0; $i < $count; $i++) {
     ];
 
     // Check if file already exists in Moodle storage.
-    if ($fs->file_exists(
-        $fileinfo['contextid'],
-        $fileinfo['component'],
-        $fileinfo['filearea'],
-        $fileinfo['itemid'],
-        $fileinfo['filepath'],
-        $fileinfo['filename']
-    )) {
+    if (
+        $fs->file_exists(
+            $fileinfo['contextid'],
+            $fileinfo['component'],
+            $fileinfo['filearea'],
+            $fileinfo['itemid'],
+            $fileinfo['filepath'],
+            $fileinfo['filename']
+        )
+    ) {
         $errors[] = "File already exists: {$filename}";
         continue;
     }

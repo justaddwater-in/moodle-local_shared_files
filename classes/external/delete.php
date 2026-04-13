@@ -58,6 +58,7 @@ class local_shared_files_delete extends external_api {
      * Delete a file or folder from the shared repository.
      *
      * @param string $path Relative path to delete.
+     * @param string $sesskey Session key for CSRF protection.
      * @return array An array containing deletion result.
      */
     public static function delete_item($path, $sesskey) {
@@ -110,7 +111,6 @@ class local_shared_files_delete extends external_api {
 
         // DELETE FROM MOODLE FILE STORAGE.
         if (is_dir($target)) {
-
             // Delete all files inside this folder (including subfolders).
             $files = $fs->get_area_files(
                 $context->id,
@@ -124,9 +124,7 @@ class local_shared_files_delete extends external_api {
             foreach ($files as $file) {
                 $file->delete();
             }
-
         } else {
-
             // Delete single file.
             $file = $fs->get_file(
                 $context->id,

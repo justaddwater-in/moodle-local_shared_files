@@ -60,6 +60,7 @@ class local_shared_files_create_folder extends external_api {
      *
      * @param string $path Relative path
      * @param string $foldername Folder name
+     * @param string $sesskey Session key for CSRF protection.
      * @return array Result data
      * @throws required_capability_exception
      */
