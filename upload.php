@@ -101,8 +101,8 @@ $uploadmax = ini_get('upload_max_filesize');
 $postmax   = ini_get('post_max_size');
 
 // Convert PHP values to bytes.
-$uploadmaxbytes = display_size_to_bytes($uploadmax);
-$postmaxbytes   = display_size_to_bytes($postmax);
+$uploadmaxbytes = get_real_size($uploadmax);
+$postmaxbytes   = get_real_size($postmax);
 
 // Final allowed size = safest minimum.
 $maxsize = min($moodlemax, $uploadmaxbytes, $postmaxbytes);
