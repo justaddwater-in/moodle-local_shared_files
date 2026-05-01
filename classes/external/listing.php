@@ -50,6 +50,7 @@ class local_shared_files_listing extends external_api {
     public static function list_items_parameters() {
         return new external_function_parameters([
             'path' => new external_value(PARAM_PATH, 'Relative repo path', VALUE_DEFAULT, ''),
+            'sesskey' => new external_value(PARAM_RAW, 'Session key'),
         ]);
     }
 
@@ -57,22 +58,26 @@ class local_shared_files_listing extends external_api {
      * List files and folders inside repository path.
      *
      * @param string $path Relative path
+     * @param string $sesskey Session key for CSRF protection.
      * @return array
      * @throws moodle_exception
      */
-    public static function list_items($path) {
+    public static function list_items($path, $sesskey) {
         global $CFG;
 
-        // Context & capability.
-        $context = context_system::instance();
-        self::validate_context($context);
-        require_capability('local/shared_files:view', $context);
-
-        // Validate params.
         $params = self::validate_parameters(
             self::list_items_parameters(),
-            ['path' => $path]
+            [
+                'path'    => $path,
+                'sesskey' => $sesskey,
+            ]
         );
+        require_sesskey();
+
+        $context = context_system::instance();
+        self::validate_context($context);
+
+        require_capability('local/shared_files:view', $context);
 
         // Resolve repo.
         $repo = get_config('local_shared_files', 'repo_path');

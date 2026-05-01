@@ -32,9 +32,18 @@ Alternatively, you can run
 
 to complete the installation from the command line.
 
-## Support and Feedback
-- This plugin is developed and maintained by <a href="https://justaddwater.in/">JUSTADDWATER</a>. 
-- You can also use <a href="https://justaddwater.in/contact/">contact page</a> on our website for reporting issues, support or any other feedback.  
+## License ##
 
-## License
-GPL v3
+2026 Justaddwater <contact@justaddwater.in>
+
+This program is free software: you can redistribute it and/or modify it under
+the terms of the GNU General Public License as published by the Free Software
+Foundation, either version 3 of the License, or (at your option) any later
+version.
+
+This program is distributed in the hope that it will be useful, but WITHOUT ANY
+WARRANTY; without even the implied warranty of MERCHANTABILITY or FITNESS FOR A
+PARTICULAR PURPOSE.  See the GNU General Public License for more details.
+
+You should have received a copy of the GNU General Public License along with
+this program.  If not, see <https://www.gnu.org/licenses/>.

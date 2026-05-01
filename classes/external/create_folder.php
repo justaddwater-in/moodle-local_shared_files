@@ -51,6 +51,7 @@ class local_shared_files_create_folder extends external_api {
         return new external_function_parameters([
             'path'       => new external_value(PARAM_PATH, 'Relative path', VALUE_DEFAULT, ''),
             'foldername' => new external_value(PARAM_FILE, 'Folder name'),
+            'sesskey'    => new external_value(PARAM_RAW, 'Session key'),
         ]);
     }
 
@@ -59,28 +60,23 @@ class local_shared_files_create_folder extends external_api {
      *
      * @param string $path Relative path
      * @param string $foldername Folder name
+     * @param string $sesskey Session key for CSRF protection.
      * @return array Result data
      * @throws required_capability_exception
      */
-    public static function create_folder($path, $foldername) {
+    public static function create_folder($path, $foldername, $sesskey) {
         global $CFG;
 
         $params = self::validate_parameters(self::create_folder_parameters(), [
             'path'       => $path,
             'foldername' => $foldername,
+            'sesskey'    => $sesskey,
         ]);
 
         $context = context_system::instance();
         self::validate_context($context);
 
-        if (!has_capability('local/shared_files:manage', $context)) {
-            throw new required_capability_exception(
-                $context,
-                'local/shared_files:manage',
-                'nopermissions',
-                ''
-            );
-        }
+        require_capability('local/shared_files:manage', $context);
 
         require_once($CFG->libdir . '/filelib.php');
 

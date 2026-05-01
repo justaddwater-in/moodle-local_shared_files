@@ -49,29 +49,35 @@ class local_shared_files_get_tree extends external_api {
      * @return external_function_parameters
      */
     public static function get_tree_parameters() {
-        return new external_function_parameters([]);
+        return new external_function_parameters([
+            'sesskey' => new external_value(PARAM_RAW, 'Session key'),
+        ]);
     }
 
     /**
      * Return directory tree from repository root.
      *
+     * @param string $sesskey Session key for CSRF protection.
+     * Return directory tree from repository root.
+     *
      * @return array Folder tree
      * @throws required_capability_exception
      */
-    public static function get_tree() {
+    public static function get_tree($sesskey) {
         global $CFG;
+
+        $params = self::validate_parameters(
+            self::get_tree_parameters(),
+            ['sesskey' => $sesskey]
+        );
+
+        require_sesskey();
 
         $context = context_system::instance();
         self::validate_context($context);
 
-        if (!has_capability('local/shared_files:view', $context)) {
-            throw new required_capability_exception(
-                $context,
-                'local/shared_files:view',
-                'nopermissions',
-                ''
-            );
-        }
+        // Capability check.
+        require_capability('local/shared_files:view', $context);
 
         $repo = get_config('local_shared_files', 'repo_path');
         if (empty($repo)) {

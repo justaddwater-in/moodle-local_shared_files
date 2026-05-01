@@ -39,7 +39,10 @@ define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notificat
                     function() {
                         Ajax.call([{
                             methodname: 'local_shared_files_delete_item',
-                            args: {path: path}
+                            args: {
+                                path: path,
+                                sesskey: M.cfg.sesskey
+                            }
                         }])[0].done(function(response) {
                             if (response.success) {
                                 $('#repo-table').DataTable().ajax.reload(null, false);

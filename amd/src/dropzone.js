@@ -22,7 +22,7 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/log'], function($, Log) {
+define(['jquery', 'core/log', 'core/notification'], function($, Log, Notification) {
     return {
         DZinit: function(canmanage) {
             require(['js/dropzone.min.js'], function() {
@@ -40,6 +40,9 @@ define(['jquery', 'core/log'], function($, Log) {
 
                 const sesskey = element.dataset.sesskey;
                 const path = element.dataset.path || '';
+
+                // NEW: flag to prevent multiple popups.
+                let errorShown = false;
 
                 const dz = new window.Dropzone(element, {
                     url: M.cfg.wwwroot + '/local/shared_files/upload.php',
@@ -61,20 +64,51 @@ define(['jquery', 'core/log'], function($, Log) {
                                 response = JSON.parse(response);
                             } catch (e) {
                                 Log.error('Invalid JSON response');
+
+                                if (!errorShown) {
+                                    Notification.alert('Error', 'Invalid server response', 'OK');
+                                    errorShown = true;
+                                }
                                 return;
                             }
                         }
 
                         if (!response.success) {
-                            Log.error('Upload failed: ' + response.error);
+                            const errorMsg = response.errors ? response.errors.join('<br>') : 'Upload failed';
+
+                            Log.error('Upload failed: ' + errorMsg);
+
+                            // Show only once.
+                            if (!errorShown) {
+                                Notification.alert('Upload Failed', errorMsg, 'OK');
+                                errorShown = true;
+                            }
+
+                            file.previewElement.classList.add('dz-error');
+                        } else {
+                            Notification.addNotification({
+                                message: 'File uploaded successfully',
+                                type: 'success'
+                            });
                         }
                     },
+
                     error: function(file, message) {
                         Log.error('Upload error: ' + message);
+
+                        // Show only once.
+                        if (!errorShown) {
+                            Notification.alert('Upload Error', message, 'OK');
+                            errorShown = true;
+                        }
                     }
                 });
 
                 dz.on('queuecomplete', function() {
+                    // Reset flag for next upload batch.
+                    errorShown = false;
+                    dz.removeAllFiles(true);
+
                     if ($.fn.DataTable.isDataTable('#repo-table')) {
                         $('#repo-table').DataTable().ajax.reload(null, false);
                     }

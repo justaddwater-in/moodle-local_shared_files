@@ -50,6 +50,7 @@ class local_shared_files_delete extends external_api {
     public static function delete_item_parameters() {
         return new external_function_parameters([
             'path' => new external_value(PARAM_PATH, 'Relative path to delete'),
+            'sesskey' => new external_value(PARAM_RAW, 'Session key'),
         ]);
     }
 
@@ -57,19 +58,26 @@ class local_shared_files_delete extends external_api {
      * Delete a file or folder from the shared repository.
      *
      * @param string $path Relative path to delete.
+     * @param string $sesskey Session key for CSRF protection.
      * @return array An array containing deletion result.
      */
-    public static function delete_item($path) {
+    public static function delete_item($path, $sesskey) {
         global $CFG;
+
+        // Validate parameters.
+        $params = self::validate_parameters(
+            self::delete_item_parameters(),
+            [
+                'path'    => $path,
+                'sesskey' => $sesskey,
+            ]
+        );
+        require_sesskey();
 
         $context = context_system::instance();
         self::validate_context($context);
-        require_capability('local/shared_files:manage', $context);
 
-        $params = self::validate_parameters(
-            self::delete_item_parameters(),
-            ['path' => $path]
-        );
+        require_capability('local/shared_files:manage', $context);
 
         $repo = get_config('local_shared_files', 'repo_path');
         if (empty($repo)) {
@@ -86,6 +94,50 @@ class local_shared_files_delete extends external_api {
 
         if ($target === $root) {
             throw new moodle_exception('noaccess', 'local_shared_files');
+        }
+
+        $fs = get_file_storage();
+
+        // Convert full path → relative path.
+        $relativepath = str_replace($root, '', $target);
+        $relativepath = ltrim($relativepath, '/');
+
+        // Extract filepath + filename.
+        $filepath = '/' . trim(dirname($relativepath), '/') . '/';
+        if ($filepath === '//') {
+            $filepath = '/';
+        }
+        $filename = basename($relativepath);
+
+        // DELETE FROM MOODLE FILE STORAGE.
+        if (is_dir($target)) {
+            // Delete all files inside this folder (including subfolders).
+            $files = $fs->get_area_files(
+                $context->id,
+                'local_shared_files',
+                'repository',
+                0,
+                "filepath LIKE '{$filepath}%'",
+                false
+            );
+
+            foreach ($files as $file) {
+                $file->delete();
+            }
+        } else {
+            // Delete single file.
+            $file = $fs->get_file(
+                $context->id,
+                'local_shared_files',
+                'repository',
+                0,
+                $filepath,
+                $filename
+            );
+
+            if ($file) {
+                $file->delete();
+            }
         }
 
         // Recursive delete.
