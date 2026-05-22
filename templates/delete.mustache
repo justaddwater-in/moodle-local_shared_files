@@ -41,71 +41,88 @@
 
 }}
 
-<h3 class="mb-3">
-  {{#str}} confirmdelete, local_shared_files, {{name}} {{/str}}
-</h3>
+<div class="local-shared-files">
+  <h3 class="mb-3">
+    {{#str}} confirmdelete, local_shared_files, {{name}} {{/str}}
+  </h3>
 
-{{#isfile}}
-<div class="repo-delete-preview">
-  <p><strong>File:</strong> {{fileinfo.path}}</p>
-  <p><strong>Size:</strong> {{fileinfo.size}}</p>
-  <p><strong>Modified:</strong> {{fileinfo.mtime}}</p>
-</div>
-{{/isfile}}
+  {{#isfile}}
+  <div class="repo-delete-preview">
+    <p>
+      <strong>{{#str}} file, local_shared_files {{/str}}</strong>
+      {{fileinfo.path}}
+    </p>
 
-{{#isfolder}}
-<p>
-  Preview of items to be deleted (max {{maxitems}})
-</p>
+    <p>
+      <strong>{{#str}} size, local_shared_files {{/str}}</strong>
+      {{fileinfo.size}}
+    </p>
 
-{{#items}}
-<table class="generaltable repo-delete-table">
-  <thead>
-    <tr>
-      <th>Path</th>
-      <th>Type</th>
-      <th>Size</th>
-      <th>Modified</th>
-    </tr>
-  </thead>
-  <tbody>
-    {{#items}}
-    <tr>
-      <td>{{path}}</td>
-      <td>{{type}}</td>
-      <td>{{size}}</td>
-      <td>{{mtime}}</td>
-    </tr>
-    {{/items}}
-  </tbody>
-</table>
-{{/items}}
-
-{{#isempty}}
-<div class="notifymessage">
-  Folder is empty.
-</div>
-{{/isempty}}
-
-{{#istruncated}}
-<div class="notice">
-  Preview truncated. More items exist.
-</div>
-{{/istruncated}}
-{{/isfolder}}
-
-<form method="post">
-  <input type="hidden" name="path" value="{{path}}">
-  <input type="hidden" name="confirm" value="1">
-  <input type="hidden" name="sesskey" value="{{sesskey}}">
-
-  <div class="form-actions mt-4">
-    <button type="submit" class="btn btn-danger">
-      {{#str}} yes {{/str}}
-    </button>
-
-    <a href="{{cancelurl}}" class="btn btn-secondary">
-      {{#str}} no {{/str}}
-    </a>
+    <p>
+      <strong>{{#str}} modified, local_shared_files {{/str}}</strong>
+      {{fileinfo.mtime}}
+    </p>
   </div>
-</form>
+  {{/isfile}}
+
+  {{#isfolder}}
+  <p>
+    {{#str}}
+    previewofitemstobedeleted,
+    local_shared_files,
+    {{maxitems}}
+    {{/str}}
+  </p>
+
+  {{#items}}
+  <table class="generaltable repo-delete-table">
+    <thead>
+      <tr>
+        <th>{{#str}} path, local_shared_files {{/str}}</th>
+        <th>{{#str}} type, local_shared_files {{/str}}</th>
+        <th>{{#str}} size, local_shared_files {{/str}}</th>
+        <th>{{#str}} modified, local_shared_files {{/str}}</th>
+      </tr>
+    </thead>
+    <tbody>
+      {{#items}}
+      <tr>
+        <td>{{path}}</td>
+        <td>{{type}}</td>
+        <td>{{size}}</td>
+        <td>{{mtime}}</td>
+      </tr>
+      {{/items}}
+    </tbody>
+  </table>
+  {{/items}}
+
+  {{#isempty}}
+  <div class="notifymessage">
+    {{#str}} folderisempty, local_shared_files {{/str}}
+  </div>
+  {{/isempty}}
+
+  {{#istruncated}}
+  <div class="notice">
+    {{#str}} previewtruncated, local_shared_files {{/str}}
+  </div>
+  {{/istruncated}}
+  {{/isfolder}}
+
+  <form method="post">
+    <input type="hidden" name="path" value="{{path}}">
+    <input type="hidden" name="confirm" value="1">
+    <input type="hidden" name="sesskey" value="{{sesskey}}">
+
+    <div class="form-actions mt-4">
+      <button type="submit" class="btn btn-danger">
+        {{#str}} yes {{/str}}
+      </button>
+
+      <a href="{{cancelurl}}" class="btn btn-secondary">
+        {{#str}} no {{/str}}
+      </a>
+    </div>
+  </form>
+</div>

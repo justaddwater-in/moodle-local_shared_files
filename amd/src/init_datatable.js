@@ -22,42 +22,89 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/ajax', 'core/log'], function($, Ajax, Log) {
+define(['jquery', 'core/ajax', 'core/log', 'core/str'], function($, Ajax, Log, Str) {
+    /**
+     * Fetch repository items.
+     *
+     * @param {String} path
+     * @returns {Object}
+     */
+    function getTableData(path) {
+        return Ajax.call([{
+            methodname: 'local_shared_files_list_items',
+            args: {
+                path: path,
+                sesskey: M.cfg.sesskey
+            }
+        }])[0];
+    }
+
+    /**
+     * Format response for DataTable.
+     *
+     * @param {Object} response
+     * @returns {Object}
+     */
+    function formatTableData(response) {
+        return {
+            data: response.data.map(function(item) {
+                return [
+                    item.name,
+                    item.type,
+                    item.size,
+                    item.actions
+                ];
+            })
+        };
+    }
+
+    /**
+     * Update DataTable callback.
+     *
+     * @param {Function} callback
+     * @param {Object} response
+     */
+    function updateTable(callback, response) {
+        callback(formatTableData(response));
+    }
+
     return {
         DTinit: function(selector, path, options) {
-            require(['js/datatables.min.js'], function() {
-                $(document).ready(function() {
-                    if ($.fn.DataTable) {
-                        $(selector).DataTable({
-                            processing: true,
-                            serverSide: false,
-                            ajax: function(data, callback) {
-                                Ajax.call([{
-                                    methodname: 'local_shared_files_list_items',
-                                    args: {
-                                        path: path,
-                                        sesskey: M.cfg.sesskey
-                                    }
-                                }])[0].done(function(response) {
-                                    callback({
-                                        data: response.data.map(function(item) {
-                                            return [
-                                                item.name,
-                                                item.type,
-                                                item.size,
-                                                item.actions
-                                            ];
-                                        })
-                                    });
-                                });
-                            },
-                            ...options
-                        });
-                    } else {
-                        Log.error('DataTables library failed to load.');
+
+            return Str.get_string(
+                'datatableloadfailed',
+                'local_shared_files'
+            )
+            .then(function(datatableloadfailed) {
+
+                require(['js/datatables.min.js'], function() {
+
+                    if (!$.fn.DataTable) {
+                        Log.error(datatableloadfailed);
+                        return;
                     }
+
+                    $(selector, '.local-shared-files').DataTable({
+                        processing: true,
+                        serverSide: false,
+
+                        ajax: function(data, callback) {
+
+                            getTableData(path)
+                                .done(updateTable.bind(
+                                    null,
+                                    callback
+                                ))
+                                .fail(Log.exception);
+                        },
+
+                        ...options
+                    });
                 });
-            });
+
+                return datatableloadfailed;
+            })
+            .catch(Log.exception);
         }
     };
 });

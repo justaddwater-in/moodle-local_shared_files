@@ -82,7 +82,7 @@ class local_shared_files_listing extends external_api {
         // Resolve repo.
         $repo = get_config('local_shared_files', 'repo_path');
         if (empty($repo)) {
-            throw new moodle_exception('configuredrepo', 'local_shared_files');
+            throw new moodle_exception('repositorynotset', 'local_shared_files');
         }
 
         $root = realpath($CFG->dataroot . '/repository/' . trim($repo, '/'));
@@ -123,10 +123,19 @@ class local_shared_files_listing extends external_api {
                     'type' => 'Folder',
                     'size' => '-',
                     'path' => $relitem,
-                    'actions' => has_capability('local/shared_files:manage', $context)
-                                ? '<button class="btn btn-danger btn-sm js-delete"
-                                    data-path="' . s($relitem) . '">Delete</button>'
-                                : '',
+                    'actions' => has_capability(
+                        'local/shared_files:manage',
+                        $context
+                    )
+                        ? html_writer::tag(
+                            'button',
+                            get_string('delete', 'local_shared_files'),
+                            [
+                                'class' => 'btn btn-danger btn-sm js-delete',
+                                'data-path' => s($relitem),
+                            ]
+                        )
+                        : '',
                 ];
             } else {
                 $size = filesize($itempath);
@@ -139,9 +148,15 @@ class local_shared_files_listing extends external_api {
                     'size' => $hsize,
                     'path' => $relitem,
                     'actions' => has_capability('local/shared_files:manage', $context)
-                                    ? '<button class="btn btn-danger btn-sm js-delete"
-                                        data-path="' . s($relitem) . '">Delete</button>'
-                                    : '',
+                        ? html_writer::tag(
+                            'button',
+                            get_string('delete', 'local_shared_files'),
+                            [
+                                'class' => 'btn btn-danger btn-sm js-delete',
+                                'data-path' => s($relitem),
+                            ]
+                        )
+                        : '',
                 ];
             }
         }
