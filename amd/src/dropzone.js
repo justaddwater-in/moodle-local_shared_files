@@ -71,6 +71,12 @@ define(['jquery', 'core/log', 'core/notification', 'core/str'], function($, Log,
                         return null;
                     }
 
+                    // Prevent duplicate initialization.
+                    if (element.dropzone) {
+                        Log.debug('Dropzone already initialized');
+                        return element.dropzone;
+                    }
+
                     const sesskey = element.dataset.sesskey;
                     const path = element.dataset.path || '';
 
