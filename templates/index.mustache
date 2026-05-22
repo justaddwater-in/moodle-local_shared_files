@@ -46,115 +46,117 @@
     }
 }}
 
-<div class="repo-layout">
+<div class="local-shared-files">
+  <div class="repo-layout">
 
-  <!-- LEFT: Folder list -->
-  {{!
-    <aside class="repo-sidebar">
-      <h6 class="repo-sidebar-title">Folders</h6>
-      <form id="create-folder-form" class="repo-create-form">
-              <input type="text"
-                    name="foldername"
-                    placeholder="Folder name"
-                    required>
-              <button type="submit" class="btn btn-secondary">
-                Create
-              </button>
-            </form>
-      <div id="repo-folder-tree">
-        <!-- Folder list will be injected here via JS -->
-      </div>
-    </aside>
-  }}
+    <!-- LEFT: Folder list -->
+    {{!
+      <aside class="repo-sidebar">
+        <h6 class="repo-sidebar-title">Folders</h6>
+        <form id="create-folder-form-sidebar" class="repo-create-form">
+                <input type="text"
+                      name="foldername"
+                      placeholder="Folder name"
+                      required>
+                <button type="submit" class="btn btn-secondary">
+                  Create
+                </button>
+              </form>
+        <div id="repo-folder-tree">
+          <!-- Folder list will be injected here via JS -->
+        </div>
+      </aside>
+    }}
 
-  <!-- RIGHT: Main content -->
-  <main class="repo-content">
+    <!-- RIGHT: Main content -->
+    <main class="repo-content">
 
-    <div class="repo-header">
+      <div class="repo-header">
 
-      {{#canmanage}}
-      <div class="repo-toolbar">
+        {{#canmanage}}
+        <div class="repo-toolbar">
 
-        <div class="tool-card p-3">
-          <div id="shared-files-dropzone"
-               class="dropzone"
-               data-uploadurl="{{upload_url}}"
-               data-sesskey="{{sesskey}}"
-               data-path="{{currentpath}}">
-            <div class="dz-message">
-              Drag & drop files here or click to upload
+          <div class="tool-card p-3">
+            <div id="shared-files-dropzone"
+                class="dropzone"
+                data-uploadurl="{{upload_url}}"
+                data-sesskey="{{sesskey}}"
+                data-path="{{currentpath}}">
+              <div class="dz-message">
+                {{#str}} dropfileshere, local_shared_files {{/str}}
+              </div>
             </div>
           </div>
         </div>
+        {{/canmanage}}
+
+        <nav class="repo-nav">
+          {{#breadcrumbs}}
+            <a href="{{url}}">{{name}}</a> /
+          {{/breadcrumbs}}
+        </nav>
+
       </div>
-      {{/canmanage}}
+      <div class="repo-actions">
+        {{#canmanage}}
+        <form id="create-folder-form" class="repo-create-inline">
+          <input type="text"
+                name="foldername"
+                placeholder="{{#str}} newfoldername, local_shared_files {{/str}}"
+                required>
+          <button type="submit" class="btn btn-secondary">
+            {{#str}} newfolder, local_shared_files {{/str}}
+          </button>
+        </form>
+        {{/canmanage}}
+      </div>
 
-      <nav class="repo-nav">
-        {{#breadcrumbs}}
-          <a href="{{url}}">{{name}}</a> /
-        {{/breadcrumbs}}
-      </nav>
+      <table id="repo-table" class="repo-table">
+        <thead>
+          <tr>
+            <th>{{#str}} name, local_shared_files {{/str}}</th>
+            <th>{{#str}} type, local_shared_files {{/str}}</th>
+            <th>{{#str}} size, local_shared_files {{/str}}</th>
+            <th>{{#str}} actions, local_shared_files {{/str}}</th>
+          </tr>
+        </thead>
+        <tbody>
 
-    </div>
-    <div class="repo-actions">
-      {{#canmanage}}
-      <form id="create-folder-form" class="repo-create-inline">
-        <input type="text"
-              name="foldername"
-              placeholder="New folder name"
-              required>
-        <button type="submit" class="btn btn-secondary">
-          + New Folder
-        </button>
-      </form>
-      {{/canmanage}}
-    </div>
+          {{#items}}
+          <tr>
+            <td>
+              {{#url}}<a href="{{url}}">{{name}}</a>{{/url}}
+              {{^url}}{{name}}{{/url}}
+            </td>
+            <td>{{type}}</td>
+            <td>{{size}}</td>
+            <td>
+              {{#can_delete}}
+                <a href="{{delete_url}}" class="btn btn-danger btn-sm">
+                  {{#str}} delete, local_shared_files {{/str}}
+                </a>
+              {{/can_delete}}
+            </td>
+          </tr>
+          {{/items}}
 
-    <table id="repo-table" class="repo-table">
-      <thead>
-        <tr>
-          <th>Name</th>
-          <th>Type</th>
-          <th>Size</th>
-          <th>Actions</th>
-        </tr>
-      </thead>
-      <tbody>
+          {{#isempty}}
+          <tr>
+            <td colspan="5" class="text-center text-muted">
+              {{#str}} emptyrepo, local_shared_files {{/str}}
+            </td>
+          </tr>
+          {{/isempty}}
 
-        {{#items}}
-        <tr>
-          <td>
-            {{#url}}<a href="{{url}}">{{name}}</a>{{/url}}
-            {{^url}}{{name}}{{/url}}
-          </td>
-          <td>{{type}}</td>
-          <td>{{size}}</td>
-          <td>
-            {{#can_delete}}
-              <a href="{{delete_url}}" class="btn btn-danger btn-sm">
-                {{#str}} delete, local_shared_files {{/str}}
-              </a>
-            {{/can_delete}}
-          </td>
-        </tr>
-        {{/items}}
+        </tbody>
+      </table>
 
-        {{#isempty}}
-        <tr>
-          <td colspan="5" class="text-center text-muted">
-            {{#str}} emptyrepo, local_shared_files {{/str}}
-          </td>
-        </tr>
-        {{/isempty}}
+      {{#isempty}}
+      <div class="repo-empty">
+        {{#str}} emptyrepo, local_shared_files {{/str}}
+      </div>
+      {{/isempty}}
 
-      </tbody>
-    </table>
-
-    {{#isempty}}
-    <div class="repo-empty">
-      {{#str}} emptyrepo, local_shared_files {{/str}}
-    </div>
-    {{/isempty}}
-
-  </main>
+    </main>
+  </div>
 </div>

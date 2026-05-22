@@ -72,6 +72,7 @@ class local_shared_files_create_folder extends external_api {
             'foldername' => $foldername,
             'sesskey'    => $sesskey,
         ]);
+        require_sesskey();
 
         $context = context_system::instance();
         self::validate_context($context);
@@ -82,17 +83,35 @@ class local_shared_files_create_folder extends external_api {
 
         $foldername = clean_filename($params['foldername']);
         if ($foldername === '' || $foldername === '.' || $foldername === '..') {
-            return ['success' => false, 'error' => 'Invalid folder name'];
+            return [
+                'success' => false,
+                'error' => get_string(
+                    'invalidfoldername',
+                    'local_shared_files'
+                ),
+            ];
         }
 
         $repo = get_config('local_shared_files', 'repo_path');
         if (empty($repo)) {
-            return ['success' => false, 'error' => 'Repository not configured'];
+            return [
+                'success' => false,
+                'error' => get_string(
+                    'repositorynotconfigured',
+                    'local_shared_files'
+                ),
+            ];
         }
 
         $root = realpath($CFG->dataroot . '/repository/' . trim($repo, '/'));
         if ($root === false) {
-            return ['success' => false, 'error' => 'Invalid repo root'];
+            return [
+                'success' => false,
+                'error' => get_string(
+                    'invalidrepositoryroot',
+                    'local_shared_files'
+                ),
+            ];
         }
 
         $target = realpath($root . '/' . $params['path']);
@@ -103,11 +122,23 @@ class local_shared_files_create_folder extends external_api {
         $newdir = $target . '/' . $foldername;
 
         if (file_exists($newdir)) {
-            return ['success' => false, 'error' => 'Folder already exists'];
+            return [
+                'success' => false,
+                'error' => get_string(
+                    'folderexists',
+                    'local_shared_files'
+                ),
+            ];
         }
 
         if (!@mkdir($newdir, 0755, false)) {
-            return ['success' => false, 'error' => 'Failed to create folder'];
+            return [
+                'success' => false,
+                'error' => get_string(
+                    'failedtocreatefolder',
+                    'local_shared_files'
+                ),
+            ];
         }
 
         return [

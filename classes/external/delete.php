@@ -88,7 +88,10 @@ class local_shared_files_delete extends external_api {
         $target = realpath($root . '/' . ltrim($params['path'], '/'));
 
         // Security checks.
-        if ($target === false || strpos($target, $root) !== 0) {
+        if (
+            $target === false ||
+            !str_starts_with($target, $root . DIRECTORY_SEPARATOR)
+        ) {
             throw new moodle_exception('noaccess', 'local_shared_files');
         }
 
@@ -109,16 +112,23 @@ class local_shared_files_delete extends external_api {
         }
         $filename = basename($relativepath);
 
+        $folderpath = '/' . trim($relativepath, '/') . '/';
+
+        if ($folderpath === '//') {
+            $folderpath = '/';
+        }
+
         // DELETE FROM MOODLE FILE STORAGE.
         if (is_dir($target)) {
             // Delete all files inside this folder (including subfolders).
-            $files = $fs->get_area_files(
+            $files = $fs->get_directory_files(
                 $context->id,
                 'local_shared_files',
                 'repository',
                 0,
-                "filepath LIKE '{$filepath}%'",
-                false
+                '/' . trim($relativepath, '/') . '/',
+                true,
+                true
             );
 
             foreach ($files as $file) {

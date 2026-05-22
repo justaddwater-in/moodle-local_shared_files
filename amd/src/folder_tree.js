@@ -66,7 +66,7 @@ define(['jquery', 'core/ajax'], function($, Ajax) {
                 sesskey: M.cfg.sesskey
             }
         }])[0].done(function(tree) {
-            $('#repo-folder-tree')
+            $('.local-shared-files #repo-folder-tree')
                 .empty()
                 .append(renderTree(tree));
         });

@@ -22,37 +22,64 @@
  * @license    https://www.gnu.org/copyleft/gpl.html GNU GPL v3 or later
  */
 
-define(['jquery', 'core/ajax', 'core/notification'], function($, Ajax, Notification) {
+define(['jquery', 'core/ajax', 'core/notification', 'core/str'], function($, Ajax, Notification, Str) {
 
     return {
         init: function() {
-            $(document).on('click', '.js-delete', function(e) {
-                e.preventDefault();
 
-                const path = $(this).data('path');
+            return Str.get_strings([
+                {key: 'delete', component: 'local_shared_files'},
+                {key: 'confirmdeleteitem', component: 'local_shared_files'},
+                {key: 'yes', component: 'moodle'},
+                {key: 'cancel', component: 'moodle'},
+                {key: 'deletefailed', component: 'local_shared_files'},
+                {key: 'unabletodeleteitem', component: 'local_shared_files'}
+            ])
+            .then(function(strings) {
 
-                Notification.confirm(
-                    'Delete',
-                    'Are you sure you want to delete this item?',
-                    'Yes',
-                    'Cancel',
-                    function() {
-                        Ajax.call([{
-                            methodname: 'local_shared_files_delete_item',
-                            args: {
-                                path: path,
-                                sesskey: M.cfg.sesskey
-                            }
-                        }])[0].done(function(response) {
-                            if (response.success) {
-                                $('#repo-table').DataTable().ajax.reload(null, false);
-                            } else {
-                                Notification.alert('Delete failed', 'Unable to delete item');
-                            }
-                        }).fail(Notification.exception);
-                    }
-                );
-            });
+                $('.local-shared-files').on('click', '.js-delete', function(e) {
+                    e.preventDefault();
+
+                    const path = $(this).data('path');
+
+                    Notification.confirm(
+                        strings[0], // Delete.
+                        strings[1], // Confirmation.
+                        strings[2], // Yes.
+                        strings[3], // Cancel.
+                        function() {
+
+                            Ajax.call([{
+                                methodname: 'local_shared_files_delete_item',
+                                args: {
+                                    path: path,
+                                    sesskey: M.cfg.sesskey
+                                }
+                            }])[0]
+                            .done(function(response) {
+
+                                if (response.success) {
+                                    $('#repo-table')
+                                        .DataTable()
+                                        .ajax.reload(null, false);
+
+                                } else {
+                                    Notification.alert(
+                                        strings[4], // Delete failed.
+                                        strings[5] // Unable to delete item.
+                                    );
+                                }
+
+                                return response;
+                            })
+                            .fail(Notification.exception);
+                        }
+                    );
+                });
+
+                return strings;
+            })
+            .catch(Notification.exception);
         }
     };
 });

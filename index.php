@@ -77,7 +77,7 @@ $PAGE->requires->css('/local/shared_files/css/datatables.min.css');
 $configrepo = get_config('local_shared_files', 'repo_path');
 if (empty($configrepo)) {
     echo $OUTPUT->header();
-    echo $OUTPUT->notification(get_string('configuredrepo', 'local_shared_files'));
+    echo $OUTPUT->notification(get_string('repositorynotset', 'local_shared_files'));
     echo $OUTPUT->footer();
     exit;
 }
@@ -157,9 +157,22 @@ $datatableoptions = [
     'info' => true,
     'pageLength' => 25,
     'lengthMenu' => [10, 25, 50],
-    'order' => false,
-    'language' => ['emptyTable' => "No Topics to display"],
+    'order' => [],
+    'language' => [
+        'emptyTable' => get_string(
+            'notopicstodisplay',
+            'local_shared_files'
+        ),
+    ],
+    'columnDefs' => [
+        [
+            'targets' => [3], // Actions column.
+            'orderable' => false,
+            'searchable' => false,
+        ],
+    ],
 ];
+
 $PAGE->requires->js_call_amd(
     'local_shared_files/init_datatable',
     'DTinit',

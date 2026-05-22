@@ -50,19 +50,35 @@ function local_shared_files_pluginfile($course, $cm, $context, $filearea, $args,
     // Args[0..n] contains path components including filename.
     $relpath = implode('/', $args);
 
-    // Get configured repo.
+    // Get configured repository.
     $repo = get_config('local_shared_files', 'repo_path');
-    if (!$repo) {
+    if (empty($repo)) {
         send_file_not_found();
     }
 
-    $full = $CFG->dataroot . '/repository/' . trim($repo, '/') . '/' . $relpath;
+    // Resolve repository root safely.
+    $root = realpath($CFG->dataroot . '/repository/' . trim($repo, '/'));
 
-    if (!file_exists($full) || !is_file($full)) {
+    if ($root === false) {
         send_file_not_found();
     }
 
-    // Send the file.
+    // Resolve requested file safely.
+    $full = realpath($root . '/' . ltrim($relpath, '/'));
+
+    // Ensure resolved file stays inside repository root.
+    if (
+        $full === false ||
+        !str_starts_with(
+            $full,
+            $root . DIRECTORY_SEPARATOR
+        ) ||
+        !is_file($full)
+    ) {
+        send_file_not_found();
+    }
+
+    // Serve file.
     send_file($full, 0, 0, true, $options);
 }
 

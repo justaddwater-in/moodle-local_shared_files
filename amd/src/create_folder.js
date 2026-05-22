@@ -26,44 +26,67 @@ define([
     'jquery',
     'core/ajax',
     'core/notification',
+    'core/str',
     'local_shared_files/folder_tree'
-], function($, Ajax, Notification, FolderTree) {
+], function($, Ajax, Notification, Str, FolderTree) {
     return {
         init: function(path) {
-            $('#create-folder-form').on('submit', function(e) {
-                e.preventDefault();
 
-                const foldername = $(this).find('[name="foldername"]').val().trim();
-                if (!foldername) {
-                    return;
-                }
+            return Str.get_strings([
+                {key: 'error', component: 'moodle'},
+                {key: 'ok', component: 'moodle'}
+            ])
+            .then(function(strings) {
 
-                Ajax.call([{
-                    methodname: 'local_shared_files_create_folder',
-                    args: {
-                        path: path,
-                        foldername: foldername,
-                        sesskey: M.cfg.sesskey
+                $('.local-shared-files #create-folder-form').on('submit', function(e) {
+                    e.preventDefault();
+
+                    const foldername = $(this)
+                        .find('[name="foldername"]')
+                        .val()
+                        .trim();
+
+                    if (!foldername) {
+                        return;
                     }
-                }])[0]
-                .done(function(response) {
-                    if (response.success) {
 
-                        if ($.fn.DataTable.isDataTable('#repo-table')) {
-                            $('#repo-table').DataTable().ajax.reload(null, false);
+                    Ajax.call([{
+                        methodname: 'local_shared_files_create_folder',
+                        args: {
+                            path: path,
+                            foldername: foldername,
+                            sesskey: M.cfg.sesskey
+                        }
+                    }])[0]
+                    .done(function(response) {
+
+                        if (response.success) {
+
+                            if ($.fn.DataTable.isDataTable('#repo-table')) {
+                                $('#repo-table')
+                                    .DataTable()
+                                    .ajax.reload(null, false);
+                            }
+
+                            FolderTree.reload();
+                            $('.local-shared-files #create-folder-form')[0].reset();
+
+                        } else {
+                            Notification.alert(
+                                strings[0], // Error.
+                                response.error,
+                                strings[1] // OK.
+                            );
                         }
 
-                        FolderTree.reload();
+                        return response;
+                    })
+                    .fail(Notification.exception);
+                });
 
-                        $('#create-folder-form')[0].reset();
-
-                    } else {
-                        Notification.alert('Error', response.error, 'OK');
-                    }
-
-                })
-                .fail(Notification.exception);
-            });
+                return strings;
+            })
+            .catch(Notification.exception);
         }
     };
 });

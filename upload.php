@@ -43,7 +43,10 @@ $relpath = optional_param('path', '', PARAM_PATH);
 // Fetch configured repository path.
 $repo = get_config('local_shared_files', 'repo_path');
 if (empty($repo)) {
-    echo json_encode(['success' => false, 'error' => 'Repository not configured']);
+    echo json_encode([
+        'success' => false,
+        'error' => get_string('repositorynotconfigured', 'local_shared_files'),
+    ]);
     exit;
 }
 
@@ -51,18 +54,21 @@ if (empty($repo)) {
 $root = $CFG->dataroot . '/repository/' . trim($repo, '/');
 $realroot = realpath($root);
 if ($realroot === false) {
-    echo json_encode(['success' => false, 'error' => 'Invalid repository root']);
+    echo json_encode([
+        'success' => false,
+        'error' => get_string('invalidrepositoryroot', 'local_shared_files'),
+    ]);
     exit;
 }
 
 // Build intended target directory path.
 $targetdir = $root . '/' . ltrim($relpath, '/');
 
-// Normalize path (remove .. attacks).
-$targetdir = str_replace(['..\\', '../'], '', $targetdir);
+// Resolve parent directory safely.
+$parentdir = realpath(dirname($targetdir));
 
-// Ensure target directory is inside allowed root.
-if (strpos(realpath(dirname($targetdir)) ?: $root, $realroot) !== 0) {
+// Ensure target directory remains inside repository root.
+if ($parentdir === false || strpos($parentdir, $realroot) !== 0) {
     $targetdir = $realroot;
 }
 
@@ -73,13 +79,19 @@ if (!is_dir($targetdir)) {
 
 // Final safety check.
 if (!is_dir($targetdir) || !is_writable($targetdir)) {
-    echo json_encode(['success' => false, 'error' => 'Target directory not writable']);
+    echo json_encode([
+        'success' => false,
+        'error' => get_string('targetdirnotwritable', 'local_shared_files'),
+    ]);
     exit;
 }
 
 // Ensure files are provided.
 if (empty($_FILES['file'])) {
-    echo json_encode(['success' => false, 'error' => 'No files uploaded']);
+    echo json_encode([
+        'success' => false,
+        'error' => get_string('nofilesuploaded', 'local_shared_files'),
+    ]);
     exit;
 }
 
@@ -148,21 +160,29 @@ for ($i = 0; $i < $count; $i++) {
 
     // Check for upload errors.
     if ($error !== UPLOAD_ERR_OK) {
-        $errors[] = "Upload error: {$name}";
+        $errors[] = get_string(
+            'uploaderror',
+            'local_shared_files',
+            $name
+        );
         continue;
     }
 
     // Enforce maximum file size.
     if ($size > $maxsize) {
         $maxmb = round($maxsize / (1024 * 1024));
-        $errors[] = "File is too large. Maximum allowed size is {$maxmb}MB.";
+        $errors[] = get_string(
+            'filetoolarge',
+            'local_shared_files',
+            $maxmb
+        );
         continue;
     }
 
     // Clean filename using Moodle API.
     $filename = clean_filename($name);
     if ($filename === '') {
-        $errors[] = "Invalid filename: {$name}";
+        $errors[] = get_string('invalidfilename', 'local_shared_files', $name);
         continue;
     }
 
@@ -170,12 +190,18 @@ for ($i = 0; $i < $count; $i++) {
     $ext = strtolower(pathinfo($filename, PATHINFO_EXTENSION));
 
     if (in_array($ext, $blockedextensions)) {
-        $errors[] = "This file type is not allowed. Please upload supported formats like PDF, Word, Excel, images, or videos.";
+        $errors[] = get_string(
+            'blockedfiletype',
+            'local_shared_files'
+        );
         continue;
     }
 
     if (!in_array($ext, $allowedextensions)) {
-        $errors[] = "Unsupported file format. Allowed formats include PDF, DOC, XLS, images, and MP4.";
+        $errors[] = get_string(
+            'unsupportedfileformat',
+            'local_shared_files'
+        );
         continue;
     }
 
@@ -183,26 +209,41 @@ for ($i = 0; $i < $count; $i++) {
     $mime = $finfo ? $finfo->file($tmp) : mime_content_type($tmp);
 
     if (!$mime) {
-        $errors[] = "Unable to detect file type: {$filename}";
+        $errors[] = get_string(
+            'unabletodetectfiletype',
+            'local_shared_files',
+            $filename
+        );
         continue;
     }
 
     if (!in_array($mime, $allowedmime)) {
-        $errors[] = "The uploaded file does not match allowed formats. Please upload a valid file.";
+        $errors[] = get_string(
+            'filetypenotallowed',
+            'local_shared_files'
+        );
         continue;
     }
 
     // Validate image files to prevent spoofed content.
     if (in_array($ext, ['jpg', 'jpeg', 'png', 'gif'])) {
         if (@getimagesize($tmp) === false) {
-            $errors[] = "Invalid image file: {$filename}";
+            $errors[] = get_string(
+                'invalidimagefile',
+                'local_shared_files',
+                $filename
+            );
             continue;
         }
     }
 
     // Prevent double extension attacks.
     if (preg_match('/\.(php|phtml|phar)\./i', $filename)) {
-        $errors[] = "Suspicious filename: {$filename}";
+        $errors[] = get_string(
+            'suspiciousfilename',
+            'local_shared_files',
+            $filename
+        );
         continue;
     }
 
@@ -227,7 +268,11 @@ for ($i = 0; $i < $count; $i++) {
             $fileinfo['filename']
         )
     ) {
-        $errors[] = "File already exists: {$filename}";
+        $errors[] = get_string(
+            'filealreadyexists',
+            'local_shared_files',
+            $filename
+        );
         continue;
     }
 
@@ -235,7 +280,11 @@ for ($i = 0; $i < $count; $i++) {
     $file = $fs->create_file_from_pathname($fileinfo, $tmp);
 
     if (!$file) {
-        $errors[] = "Failed to save: {$filename}";
+        $errors[] = get_string(
+            'failedtosave',
+            'local_shared_files',
+            $filename
+        );
         continue;
     }
 
@@ -246,7 +295,11 @@ for ($i = 0; $i < $count; $i++) {
         // Rollback Moodle file to maintain consistency.
         $file->delete();
 
-        $errors[] = "Failed to save in repository: {$filename}";
+        $errors[] = get_string(
+            'failedtosaveinrepo',
+            'local_shared_files',
+            $filename
+        );
         continue;
     }
 
